@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         ContentResolver contentResolver=getContentResolver();
         Uri uri= ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         Cursor cursor=contentResolver.query(uri,null,null,null,null);
-        Log.i("Contact Provider Demo", "Total # No of Contacts ::: " +Integer.toString(cursor.getCount()));
+        Log.w("Contact Provider Demo", "Total # No of Contacts ::: " +Integer.toString(cursor.getCount()));
         if(cursor.getCount()>0){
             while (cursor.moveToNext()){
                 @SuppressLint("Range") String contactname= cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
